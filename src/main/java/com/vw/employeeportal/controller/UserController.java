@@ -5,8 +5,8 @@ import com.vw.employeeportal.binding.LoginForm;
 import com.vw.employeeportal.binding.SignUpForm;
 import com.vw.employeeportal.binding.UnlockForm;
 import com.vw.employeeportal.entity.UserDetails;
-import com.vw.employeeportal.repository.UserDetailsRepo;
 import com.vw.employeeportal.service.UserService;
+import jakarta.servlet.http.HttpSession; // Import HttpSession
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,18 +22,37 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserDetailsRepo userDetailsRepo;
+    // The unused UserDetailsRepo has been removed for cleanliness
 
+    // This method now handles both the root ("/") and "/login" URLs
+    @GetMapping({"/", "/login"})
+    public String loginPage(Model model) {
+        model.addAttribute("login", new LoginForm());
+        // It now correctly returns "index" to match your file name
+        return "index";
+    }
 
-    // this  method will load the signup page
+    @PostMapping("/login")
+    public String handleLogin(@ModelAttribute("login") LoginForm form, Model model, HttpSession session) {
+        UserDetails user = userService.login(form);
+
+        if (user != null) {
+            // Store user ID and account type in session
+            session.setAttribute("userId", user.getUserId());
+            return "redirect:/dashboard";
+        } else {
+            model.addAttribute("errMsg", "Invalid Credentials");
+            // On failure, it re-renders the index page with the error
+            return "index";
+        }
+    }
+
     @GetMapping("/signup")
-    public String signUpPage(Model model){ //when my sign up page is loading i need to send the binding object . empty binding object i need to send
-        model.addAttribute("user", new SignUpForm()); // We put an empty SignUpForm object into the model so the HTML form knows what to bind its fields to and can show empty fields ready for user input. User is the binding object here.
+    public String signUpPage(Model model){
+        model.addAttribute("user", new SignUpForm());
         return "signup";
     }
 
-    //to submit the form I need to write a method
     @PostMapping("/signup")
     public String handleSignUp(@ModelAttribute("user") SignUpForm form, Model model){
         boolean status = userService.signUp(form);
@@ -45,46 +64,27 @@ public class UserController {
         return "signup";
     }
 
-    @GetMapping("/login")
-    public String loginPage(Model model) {
-        model.addAttribute("login", new LoginForm());
-        return "login";
-    }
-
-    @PostMapping("/login")
-    public String handleLogin(@ModelAttribute("login") LoginForm form, Model model) {
-        String status = userService.login(form);
-
-        if ("success".equals(status)) {
-            return "redirect:/dashboard";  // redirect to existing GET method
-        } else {
-            model.addAttribute("errMsg", status);
-            return "login";
-        }
-    }
-
     @GetMapping("/unlock")
     public String unlockAccount(@RequestParam("email") String email, Model model ){
-        // @RequestParam("email") String email — This tells Spring to read a query parameter named email from the URL (e.g., /unlock?email=test@gmail.com) and give it to us as a Java String.
-        UnlockForm unlockForm = new UnlockForm(); // This object will hold data to show on the page or receive form data from the user later.
+        UnlockForm unlockForm = new UnlockForm();
         unlockForm.setEmail(email);
         model.addAttribute("unlock", unlockForm);
         return "unlockAccount";
     }
 
     @PostMapping("/unlock")
-    public String unlockAccount(@ModelAttribute("unlock") UnlockForm form , Model model){ //@ModelAttribute("unlock") automatically binds form fields to UnlockForm object.
-        // Check if new and confirm passwords match
+    public String unlockAccount(@ModelAttribute("unlock") UnlockForm form , Model model){
         if (!form.getNewPwd().equals(form.getConfirmPwd())){
-           model.addAttribute("errMsg","New Password and Confirm Password do not match!");
-           model.addAttribute("unlock",form);
-           return "unlockAccount";
+            model.addAttribute("errMsg","New Password and Confirm Password do not match!");
+            model.addAttribute("unlock",form);
+            return "unlockAccount";
         }
-       boolean status = userService.unlockAccount(form);
+        boolean status = userService.unlockAccount(form);
         if (status){
             model.addAttribute("succMsg", "Your account unlocked successfully. Please login now.");
-            model.addAttribute("login", new LoginForm()); // We create a new LoginForm object so the login page has a fresh form to bind.
-            return "login";
+            // Return to the main login page
+            model.addAttribute("login", new LoginForm());
+            return "index";
         }else {
             model.addAttribute("errMsg","Invalid temporary password!");
             model.addAttribute("unlock", form);
@@ -92,26 +92,19 @@ public class UserController {
         }
     }
 
-
     @GetMapping("/forgotPwd")
     public String forgotPwdPage(){
         return "forgotPwd";
     }
 
     @PostMapping("/forgotPwd")
-    public String forgotPwd(@RequestParam("email") String email, Model model){ // i am taking form email from UI by @RequestParam
-        System.out.println(email);
-        //if the email is coming then i need to write a logic
-       boolean status = userService.forgotPwd(email);
-       if (status){
-           // send the success message
-           model.addAttribute("succMsg", "Password sent to your email");
-       }else
-       {
-           //send error msg
-           model.addAttribute("errMsg","Invalid email");
-       }
-        //i need to verify that if
+    public String forgotPwd(@RequestParam("email") String email, Model model){
+        boolean status = userService.forgotPwd(email);
+        if (status){
+            model.addAttribute("succMsg", "Password sent to your email");
+        }else {
+            model.addAttribute("errMsg","Invalid email");
+        }
         return "forgotPwd";
     }
 }

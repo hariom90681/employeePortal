@@ -1,100 +1,133 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VwEmployeePortal</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr"
-          crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | VW Employee Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6;
+        }
+        .main-container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        .left-pane {
+            background-image: url('/images/car1.jpg'); /* Using one of your car images */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 40px;
+            position: relative;
+        }
+        .left-pane::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 51, 102, 0.7); /* Dark blue overlay */
+        }
+        .left-pane-content {
+            position: relative; /* To appear above the overlay */
+            z-index: 1;
+        }
+        .right-pane {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background-color: #ffffff;
+        }
+        .login-form-wrapper {
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-form-wrapper .logo {
+            max-width: 100px;
+            margin-bottom: 20px;
+        }
+        .form-control:focus {
+            border-color: #003366;
+            box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.25);
+        }
+        .btn-primary {
+            background-color: #003366;
+            border-color: #003366;
+        }
+        .btn-primary:hover {
+            background-color: #002244;
+            border-color: #002244;
+        }
+        .form-links a {
+            color: #003366;
+            text-decoration: none;
+        }
+        .form-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
-<style>
-    .footer {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      background-color: white;
-      color: blue;
-      text-align: center;
-    }
-</style>
 <body>
 
-    <div class="container">
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="/">
-                    <img th:src="@{/images/VwLogo.jpg}" src="/images/VwLogo.jpg" alt="Logo" width="40" height="40" class="d-inline-block align-text-top">
-                </a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Courses</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Contact Us</a></li>
-                    </ul>
-                    <a href="login" class="btn btn-danger">Login</a>
-                </div>
-            </div>
-        </nav>
-        <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img src="/images/banner1.jpg" class="d-block w-100" alt="Banner 1">
-                </div>
-                <div class="carousel-item active">
-                    <img src="/images/banner2.jpg" class="d-block w-100" alt="Banner 2">
-                </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
-
-        <h2 class="text-center">Trending Cars</h2>
-
-        <div class="row">
-
-            <div class="col-md-4">
-                <img alt="" src="/images/car1.jpg" width="300px">
-            </div>
-
-            <div class="col-md-4">
-                <img alt="" src="/images/car2.jpg" width="300px">
-            </div>
-
-            <div class="col-md-4">
-                <img alt="" src="/images/car3.jpg" width="300px">
+<div class="container-fluid p-0 main-container">
+    <div class="row g-0 w-100">
+        <div class="col-lg-7 d-none d-lg-block left-pane">
+            <div class="left-pane-content">
+                <h1 class="display-4 fw-bold">Welcome Back</h1>
+                <p class="lead mt-3">Your central hub for all employee enquiries and information.</p>
             </div>
         </div>
 
+        <div class="col-lg-5 col-md-12 right-pane">
+            <div class="login-form-wrapper">
+                <img th:src="@{/images/VwLogo.jpg}" alt="Logo" class="logo">
+                <h2 class="fw-bold mb-4">Employee Login</h2>
+
+                <div th:if="${succMsg}" class="alert alert-success" th:text="${succMsg}"></div>
+                <div th:if="${errMsg}" class="alert alert-danger" th:text="${errMsg}"></div>
+
+                <form th:action="@{/login}" method="post" th:object="${login}">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4 form-links">
+                    <a th:href="@{/forgotPwd}">Forgot password?</a>
+                </div>
+                <hr>
+                <div class="text-center">
+                    <p>Don't have an account? <a th:href="@{/signup}">Sign Up</a></p>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
-        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-        <div class="footer">
-            <p>2025 Copyright: @Volkswagen </p>
-        </div>
-
 </html>

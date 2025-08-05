@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,6 +22,18 @@ public class UserDetails {
     private String phoneNumber;
     private String password;
     private String accStatus;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<EmployeeEnquiry> enquiries;
+
+    public List<EmployeeEnquiry> getEnquiries() {
+        return enquiries;
+    }
+
+    public void setEnquiries(List<EmployeeEnquiry> enquiries) {
+        this.enquiries = enquiries;
+    }
+
 
     public Integer getUserId() {
         return userId;

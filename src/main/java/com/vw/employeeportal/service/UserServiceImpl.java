@@ -7,6 +7,7 @@ import com.vw.employeeportal.entity.UserDetails;
 import com.vw.employeeportal.repository.UserDetailsRepo;
 import com.vw.employeeportal.utils.EmailUtil;
 import com.vw.employeeportal.utils.PwdUtil;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,10 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private EmailUtil emailUtil;
+    @Autowired
+    private HttpSession session;
+
+
 
     @Override
     public boolean signUp(SignUpForm form) {
@@ -76,19 +81,29 @@ public class UserServiceImpl implements UserService{
 
 
     @Override
-    public String login(LoginForm form) {
-       UserDetails entity = userDetailsRepo.findByEmail(form.getEmail());
+    public UserDetails login(LoginForm form) {
+        // 1. Find the user by their email address from the database
+        UserDetails userEntity = userDetailsRepo.findByEmail(form.getEmail());
 
-       if (entity == null){
-          return  "Invalid Credentials";
-       }
-       if (!entity.getPassword().equals(form.getPassword())){
-           return  "Invalid Credentials";
-       }
-       if ("LOCKED".equals(entity.getAccStatus())){
-           return "Your account is locked!";
-       }
-        return "success";
+        // 2. If no user is found with that email, login fails
+        if (userEntity == null) {
+            return null;
+        }
+
+        // 3. If a user is found, check if their account is locked
+        if ("LOCKED".equals(userEntity.getAccStatus())) {
+            // Account is locked, login fails
+            return null;
+        }
+
+        // 4. If the account is not locked, check if the provided password matches
+        if (userEntity.getPassword().equals(form.getPassword())) {
+            // Password matches, login is successful. Return the full user object.
+            return userEntity;
+        }
+
+        // 5. If the password does not match, login fails
+        return null;
     }
 
 

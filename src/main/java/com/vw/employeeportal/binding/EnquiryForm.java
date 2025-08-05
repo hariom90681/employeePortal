@@ -11,12 +11,12 @@ public class EnquiryForm {
 
     private String employeeName;
 
-    private Long employeePhNo;
+    private Long employeePhone;
 
-    private String classMode;
+    private String enquiryType;    // e.g. HR, IT, Operations (was "classMode")
 
-    private String courseName;
+    private String enquiryTopic;   // e.g. Payroll, System Access (was "courseName")
 
-    private String enqStatus;
+    private String enqStatus;      // e.g. NEW, ENROLLED, LOST
 
 }
