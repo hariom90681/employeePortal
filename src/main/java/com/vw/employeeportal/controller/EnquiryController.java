@@ -30,10 +30,12 @@ public class EnquiryController {
 
     @GetMapping("/dashboard")
     public String dashboardPage(Model model, HttpSession session) {
+
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/"; // Redirect to login if user is not in session
         }
+
         DashboardResponse dashboardData = enquiryService.getDashboardData(userId);
         model.addAttribute("dashboardData", dashboardData);
         return "dashboard";

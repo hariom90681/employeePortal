@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.vw.employeeportal.exception.LoginFailedException;
 
 import static com.vw.employeeportal.utils.PwdUtil.generateRandomPwd;
 
@@ -25,6 +26,25 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private HttpSession session;
 
+
+    @Override
+    public UserDetails login(LoginForm form) {
+
+        // 1. Find the user by their unique email
+        UserDetails userEntity = userDetailsRepo.findByEmail(form.getEmail());
+
+        // 2. Check for failure: user not found or password incorrect, We throw the same generic message for both to enhance security.
+        if (userEntity == null || !userEntity.getPassword().equals(form.getPassword())) {
+            throw new LoginFailedException("Invalid email or password.");
+        }
+
+        // 3. Check for a different failure: account is locked.
+        if ("LOCKED".equals(userEntity.getAccStatus())) {
+            throw new LoginFailedException("This account has been locked. Please contact support.");
+        }
+
+        return userEntity;
+    }
 
 
     @Override
@@ -77,33 +97,6 @@ public class UserServiceImpl implements UserService{
             return true;
         }
         return false;
-    }
-
-
-    @Override
-    public UserDetails login(LoginForm form) {
-        // 1. Find the user by their email address from the database
-        UserDetails userEntity = userDetailsRepo.findByEmail(form.getEmail());
-
-        // 2. If no user is found with that email, login fails
-        if (userEntity == null) {
-            return null;
-        }
-
-        // 3. If a user is found, check if their account is locked
-        if ("LOCKED".equals(userEntity.getAccStatus())) {
-            // Account is locked, login fails
-            return null;
-        }
-
-        // 4. If the account is not locked, check if the provided password matches
-        if (userEntity.getPassword().equals(form.getPassword())) {
-            // Password matches, login is successful. Return the full user object.
-            return userEntity;
-        }
-
-        // 5. If the password does not match, login fails
-        return null;
     }
 
 

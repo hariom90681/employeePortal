@@ -5,7 +5,9 @@ import com.vw.employeeportal.binding.LoginForm;
 import com.vw.employeeportal.binding.SignUpForm;
 import com.vw.employeeportal.binding.UnlockForm;
 import com.vw.employeeportal.entity.UserDetails;
+import com.vw.employeeportal.exception.LoginFailedException;
 import com.vw.employeeportal.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession; // Import HttpSession
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,7 +24,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // The unused UserDetailsRepo has been removed for cleanliness
 
     // This method now handles both the root ("/") and "/login" URLs
     @GetMapping({"/", "/login"})
@@ -32,7 +33,7 @@ public class UserController {
         return "index";
     }
 
-    @PostMapping("/login")
+ /*   @PostMapping("/login")
     public String handleLogin(@ModelAttribute("login") LoginForm form, Model model, HttpSession session) {
         UserDetails user = userService.login(form);
 
@@ -45,8 +46,26 @@ public class UserController {
             // On failure, it re-renders the index page with the error
             return "index";
         }
-    }
+    }*/
 
+    @PostMapping("/login")
+    public String handleLogin(LoginForm form, Model model, HttpSession session) {
+
+        try {
+            // 1. Call the service to perform the login logic.
+            UserDetails user = userService.login(form);
+            //create session and store user data in session
+            session.setAttribute("userId", user.getUserId());
+
+            // 4. Redirect the user to their main page.
+            return "redirect:/dashboard";
+
+        } catch (LoginFailedException e) {
+
+            model.addAttribute("error", e.getMessage());
+            return "login";
+        }
+    }
     @GetMapping("/signup")
     public String signUpPage(Model model){
         model.addAttribute("user", new SignUpForm());
